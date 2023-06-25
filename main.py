@@ -1,6 +1,18 @@
-import wiringpi
+import wiringpi;
+import time;
 
-# One of the following MUST be called before using IO functions:
-wiringpi.wiringPiSetup()      # For sequential pin numbering
-wiringpi.pinMode(2, 0)  
-wiringpi.digitalRead(2)   
+wiringpi.wiringPiSetup();
+
+pin = 2;
+run = True;
+start = False
+wiringpi.pinMode(pin, 1)   
+def boolToInt(b):
+    if(b):
+        return 1
+    if(b == False):
+       return 0
+while run:
+    time.sleep(0.5);
+    start = not start;
+    wiringpi.digitalWrite(pin, boolToInt(start))
