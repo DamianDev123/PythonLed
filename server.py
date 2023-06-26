@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 import wiringpi
+from multiprocessing import Process, Value
 # One of the following MUST be called before using IO functions:
 b1 = 2;
 b2 = 5;
@@ -28,11 +29,14 @@ def boolToInt(b):
   if (b == False):
     return 0
 
-@socketio.on('newPos')
-def button():
-  b1Value = wiringpi.digitalRead(b1)*-1
-  b2Value = wiringpi.digitalRead(b2)*-1
-  socketio.emit("UpdatedKeys",{ x : b1Value, y : b2Value})
+def record_loop():
+    while True:
+      b1Value = wiringpi.digitalRead(b1)*-1
+      b2Value = wiringpi.digitalRead(b2)*-1
+      socketio.emit("UpdatedKeys",{ x : b1Value, y : b2Value})
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0')
+  p = Process(target=record_loop)
+  p.start()
+  socketio.run(app, host='0.0.0.0')
+  p.join()
