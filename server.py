@@ -1,10 +1,12 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 import wiringpi
-
 # One of the following MUST be called before using IO functions:
+b1 = 2;
+b2 = 5;
 wiringpi.wiringPiSetup()      # For sequential pin numbering
-wiringpi.pinMode(2, 1) 
+wiringpi.pinMode(b1, 0) 
+wiringpi.pinMode(b2, 0) 
 
 app = Flask('app',static_url_path='', 
             static_folder='templates')
@@ -12,8 +14,9 @@ app = Flask('app',static_url_path='',
 @app.route('/')
 def index():
   return render_template('index.html')
+
 socketio = SocketIO(app)
-on = False;
+
 def Reverse(b):
   if (b):
     return False
@@ -24,12 +27,12 @@ def boolToInt(b):
     return 1
   if (b == False):
     return 0
-@socketio.on('button')
-def buttonMsg(data):
-  global on, wiringpi
-  on = Reverse(on)
-  wiringpi.digitalWrite(2, boolToInt(on))
 
+@socketio.on('newPos')
+def button():
+  b1Value = wiringpi.digitalRead(b1)*-1
+  b2Value = wiringpi.digitalRead(b2)*-1
+  socketio.emit("UpdatedKeys",{ x : b1Value, y : b2Value})
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
