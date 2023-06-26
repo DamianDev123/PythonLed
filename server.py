@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 import wiringpi
-from multiprocessing import Process, Value
+import threading
 # One of the following MUST be called before using IO functions:
 b1 = 2;
 b2 = 5;
@@ -33,10 +33,9 @@ def record_loop():
     while True:
       b1Value = wiringpi.digitalRead(b1)*-1
       b2Value = wiringpi.digitalRead(b2)*-1
-      socketio.emit("UpdatedKeys",{ x : b1Value, y : b2Value})
+      socketio.emit("UpdatedKeys",[b1Value,b2Value])
 
 if __name__ == '__main__':
-  p = Process(target=record_loop)
-  p.start()
+  t = threading.Thread(target=record_loop, args=[0])
+  t.start()
   socketio.run(app, host='0.0.0.0')
-  p.join()
