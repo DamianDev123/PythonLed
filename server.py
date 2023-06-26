@@ -1,10 +1,10 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO
-import wiringpi;
+import wiringpi
 
-wiringpi.wiringPiSetup();
-
-wiringpi.pinMode(2, 1)
+# One of the following MUST be called before using IO functions:
+wiringpi.wiringPiSetup()      # For sequential pin numbering
+wiringpi.pinMode(2, 1) 
 
 app = Flask('app',static_url_path='', 
             static_folder='templates')
@@ -26,8 +26,9 @@ def boolToInt(b):
     return 0
 @socketio.on('button')
 def buttonMsg(data):
+  global on, wiringpi
   on = Reverse(on)
-  wiringpi.digitalWrite(2, boolToInt(on))
+  wiringpi.digitalWrite(6, 1)
 
 
 if __name__ == '__main__':
