@@ -28,7 +28,7 @@ def boolToInt(b):
 def buttonMsg(data):
   global on, wiringpi
   on = Reverse(on)
-  wiringpi.digitalWrite(6, 1)
+  wiringpi.digitalWrite(2, boolToInt(on))
 
 
 if __name__ == '__main__':
